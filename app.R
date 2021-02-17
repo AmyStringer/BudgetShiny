@@ -13,36 +13,72 @@ library(shiny)
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
+    titlePanel("Budget Constructer"),
+        
+        fluidRow(
+            column(width = 4, 
+                radioButtons("timeFrame", "Select One", 
+                             choices = c("Fortnightly", 
+                                         "Monthly", 
+                                         "Yearly"))
+            ),
+            column(width = 4, 
+                radioButtons("SavType", "Savings = ($ or %)", 
+                             choices = c("$", "%"))     
+            )
+            
         ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-           plotOutput("distPlot")
-        )
+        fluidRow(
+            
+            column(width = 4,
+                h3("Add Income"),
+                textInput("incomeName", "Ref. Name"), 
+                numericInput("incomeVal", "Amount", value = ""), 
+                actionButton("AddInc", "Add")
+            ), 
+            column(width = 4,
+                h3("Add Expenses"),
+                textInput("expenseName", "Ref.Name"),
+                numericInput("expenseVal", "Amount", ""),
+                actionButton("AddExp", "Add")
+            ), 
+            column(width = 4, 
+                h3("Add Savings"), 
+                textInput("savName", "Ref.Name"),
+                numericInput("savVal", "Amount", ""),
+                actionButton("AddSav", "Add")
+                )
+            
+        ),
+    
+    tabsetPanel(
+        tabPanel("Income",
+                 
+                 dataTableOutput("Income")
+                 
+                 ), 
+        tabPanel("Expenses",
+                 
+                 dataTableOutput("Expenses")
+                 
+                 ), 
+        tabPanel("Summary",
+                 
+                 dataTableOutput("Summary")
+                 
+                 )
     )
-)
+    )
+
+
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
-    })
+    IncomeTab <- reactiveValues(data = NULL)
+    
+    
+    
 }
 
 # Run the application 
