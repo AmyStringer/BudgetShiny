@@ -8,13 +8,14 @@
 #
 
 library(shiny)
+library(shinythemes)
+library(tidyverse)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-
     # Application title
     titlePanel("Budget Constructer"),
-        
+    theme = shinythemes::shinytheme(theme = "slate"),
         fluidRow(
             column(width = 4, 
                 radioButtons("timeFrame", "Select One", 
