@@ -10,12 +10,13 @@
 library(shiny)
 library(shinythemes)
 library(tidyverse)
+library(DT)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
     # Application title
     titlePanel("Budget Constructer"),
-    theme = shinythemes::shinytheme(theme = "slate"),
+    theme = shinythemes::shinytheme(theme = "journal"),
         fluidRow(
             column(width = 4, 
                 radioButtons("timeFrame", "Select One", 
@@ -35,19 +36,19 @@ ui <- fluidPage(
                 h3("Add Income"),
                 textInput("incomeName", "Ref. Name"), 
                 numericInput("incomeVal", "Amount", value = ""), 
-                actionButton("AddInc", "Add")
+                actionButton("addInc", "Add")
             ), 
             column(width = 4,
                 h3("Add Expenses"),
                 textInput("expenseName", "Ref.Name"),
                 numericInput("expenseVal", "Amount", ""),
-                actionButton("AddExp", "Add")
+                actionButton("addExp", "Add")
             ), 
             column(width = 4, 
                 h3("Add Savings"), 
                 textInput("savName", "Ref.Name"),
                 numericInput("savVal", "Amount", ""),
-                actionButton("AddSav", "Add")
+                actionButton("addSav", "Add")
                 )
             
         ),
@@ -78,6 +79,16 @@ server <- function(input, output) {
 
     IncomeTab <- reactiveValues(data = NULL)
     
+    observeEvent(input$addInc, {
+        temp <- data_frame(`Ref. Name` = input$incomeName, 
+                           Amount = input$incomeVal)
+        
+        IncomeTab$data <- bind_rows(temp, IncomeTab$data)
+    })
+    
+    output$Income <- renderDataTable({
+        IncomeTab$data
+    })
     
     
 }
