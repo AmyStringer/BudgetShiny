@@ -17,9 +17,14 @@ ui <- fluidPage(
     # Application title
     theme = shinythemes::shinytheme(theme = "journal"),
     navbarPage(title = "Budget Helper",
-        tabPanel("Welcome"
+        tabPanel("Welcome",
                  
-                 
+                 h3("Budget Tool"), 
+                 h5("This app consists of two main features"), 
+                 tags$ol(
+                     tags$li("A budget tool that allows you to visualise your income, expenses and desired savings in table format, and"),
+                     tags$li("A projection tool that allows you to work out how much you'll earn or save on a month to month basis across a whole year. This tool was created mainly for those who go from fixed/casual contract to fixed/casual contract")
+                 )
                  
                  ), 
         tabPanel("Budget",
