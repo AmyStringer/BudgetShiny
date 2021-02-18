@@ -57,10 +57,11 @@ ui <- fluidPage(
                     )
                 
             ),
+            tags$hr(),
         
         tabsetPanel(
             tabPanel("Budget",
-                     
+                     textOutput("summary"),
                      column(width = 4,
                         
                          h5("To remove rows from the income table, select them, and then hit the remove button below.") ,   
@@ -95,6 +96,7 @@ ui <- fluidPage(
                  
                  )
     )
+    
 )
 
 
@@ -173,6 +175,23 @@ server <- function(input, output) {
         temp <- data.frame(Total = "Total", Amount = sum(SavingsTab$data$Amount))
         tot <- bind_rows(SavingsTab$data, temp)
         datatable(tot, selection = "multiple")
+    })
+    
+    output$summary <- renderText({
+        
+        totInc <- sum(IncomeTab$data$Amount)
+        totExp <- sum(ExpenseTab$data$Amount)
+        totSav <- sum(SavingsTab$data$Amount)
+        
+        rem <- totInc - totExp - totSav
+        
+        paste0("In your budget for this period, you have earned, $", 
+               totInc, 
+               ". Your planned expenses come to a total of, $", 
+               totExp, 
+               " and you plan to put away, $", 
+               totSav, 
+               ". This leaves you with $", rem, " for miscellaneous expenses. ")
     })
     
 }
