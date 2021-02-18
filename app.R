@@ -91,8 +91,23 @@ ui <- fluidPage(
                      )
         )
         ), 
-        tabPanel("Project Income" 
+        tabPanel("Project Income", 
                  
+                 sidebarLayout(
+                     sidebarPanel(
+                         radioButtons("timeframe", "Pay Cycle", 
+                                      choices = c("Weekly" = 52, 
+                                                  "Fortnightly" = 26, 
+                                                  "Monthly" = 12)),
+                         numericInput("hours", "Hours per Pay Cycle", value = 0),
+                         numericInput("rate", "Rate", value = 0),
+                         numericInput("save", "Savings Per Pay Cycle", value = 0)
+                     ),
+                     mainPanel(
+                         dataTableOutput("CumSum"),
+                         plotOutput("ProjIncome")
+                     )
+                 )
                  
                  )
     )
@@ -193,6 +208,42 @@ server <- function(input, output) {
                totSav, 
                ". This leaves you with $", rem, " for miscellaneous expenses. ")
     })
+    
+    #### Projections tab #### 
+    
+    output$CumSum <- renderDataTable({
+
+        month <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+        dat <- data_frame(Month = month, 
+                          Pay = round((input$hours * input$rate * as.numeric(input$timeframe))/12, 2), 
+                          Savings = round((input$save * as.numeric(input$timeframe))/12,2)) %>% 
+            mutate(CumPay = round(cumsum(Pay),2), 
+                   CumSave = round(cumsum(Savings),2)) %>%
+            select(c("Month", "CumPay", "CumSave")) %>%
+            pivot_longer(cols = c(CumPay, CumSave), names_to = "Amount") %>% 
+            pivot_wider(names_from = Month, values_from = value)
+        
+        datatable(dat)
+        
+    })
+    
+    output$ProjIncome <- renderPlot({
+        month <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+        dat <- data_frame(Month = month, 
+                          Pay = round((input$hours * input$rate * as.numeric(input$timeframe))/12, 2), 
+                          Savings = round((input$save * as.numeric(input$timeframe))/12,2)) %>% 
+            mutate(CumPay = round(cumsum(Pay),2), 
+                   CumSave = round(cumsum(Savings),2))
+        
+        ggplot(data = dat, aes(x = factor(Month, levels =  c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")))) +
+            geom_point(aes(y = CumPay, color = "Cumulative Pay") ) + 
+            geom_point(aes(y = CumSave, color = "Cumulative Savings") ) +
+            labs(x = "Month", 
+                   y = "Dollars") + 
+            scale_color_manual(values = c("lightskyblue", "salmon")) + 
+            theme_bw()
+    })
+    
     
 }
 
